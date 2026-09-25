@@ -1,3 +1,15 @@
+from coinbase_insights.analytics.forecasting import (
+    Forecast,
+    ForecastBundle,
+    ForecastModel,
+    ForecastRole,
+    ForecastScore,
+    ForecastScoreStatus,
+    ForecastStatus,
+    PredictionLedger,
+    StatsmodelsAutoRegForecaster,
+    create_forecast,
+)
 from coinbase_insights.analytics.metrics import (
     CurrentMarketMetrics,
     MaximumSpreadTracker,
@@ -8,8 +20,18 @@ from coinbase_insights.analytics.metrics import (
 
 __all__ = [
     "CurrentMarketMetrics",
+    "Forecast",
+    "ForecastBundle",
+    "ForecastModel",
+    "ForecastRole",
+    "ForecastScore",
+    "ForecastScoreStatus",
+    "ForecastStatus",
     "MaximumSpreadTracker",
     "MidPriceObservation",
+    "PredictionLedger",
+    "StatsmodelsAutoRegForecaster",
     "calculate_current_metrics",
+    "create_forecast",
     "observe_mid_price",
 ]
