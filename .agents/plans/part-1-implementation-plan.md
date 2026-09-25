@@ -59,7 +59,7 @@ Use `uv run pytest --cov=coinbase_insights --cov-branch` for explicit coverage r
 | 1 | Complete | Exact domain records and valid in-memory order book | `order-book-development` |
 | 2 | Complete | Typed Coinbase contracts and source-to-domain mapping | `coinbase-feed-development` |
 | 3 | Complete | Bounded histories and exact required metrics | `market-metrics-development` |
-| 4 | Pending | Naive and AutoReg forecasts with correct maturity/error tracking | `forecasting-development` |
+| 4 | Complete | Naive and AutoReg forecasts with correct maturity/error tracking | `forecasting-development` |
 | 5 | Pending | Stable configuration, result contract, console, and NDJSON | `cli-output-development` |
 | 6 | Pending | Resilient live WebSocket adapter and feed-health state machine | `coinbase-feed-development` |
 | 7 | Pending | Five-second runtime composition and recorded-stream end-to-end path | `market-metrics-development` |
