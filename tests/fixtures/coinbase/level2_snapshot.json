@@ -1,0 +1,26 @@
+{
+  "channel": "l2_data",
+  "timestamp": "2026-09-25T12:00:00.500000Z",
+  "sequence_num": 100,
+  "events": [
+    {
+      "type": "snapshot",
+      "product_id": "BTC-USD",
+      "updates": [
+        {
+          "side": "bid",
+          "event_time": "2026-09-25T12:00:00Z",
+          "price_level": "100.000000000000000001",
+          "new_quantity": "2.5"
+        },
+        {
+          "side": "offer",
+          "event_time": "2026-09-25T12:00:00Z",
+          "price_level": "101.000000000000000002",
+          "new_quantity": "3.5"
+        }
+      ]
+    }
+  ],
+  "_fixture_provenance": "synthetic: derived from Coinbase Advanced Trade AsyncAPI"
+}
