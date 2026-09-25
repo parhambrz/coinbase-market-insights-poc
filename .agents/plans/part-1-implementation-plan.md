@@ -56,7 +56,7 @@ Use `uv run pytest --cov=coinbase_insights --cov-branch` for explicit coverage r
 | Milestone | Status | Outcome | Primary skill |
 |---|---|---|---|
 | 0 | Complete | Reproducible Python project and quality commands | `part1-packaging-delivery` |
-| 1 | Pending | Exact domain records and valid in-memory order book | `order-book-development` |
+| 1 | Complete | Exact domain records and valid in-memory order book | `order-book-development` |
 | 2 | Pending | Typed Coinbase contracts and source-to-domain mapping | `coinbase-feed-development` |
 | 3 | Pending | Bounded histories and exact required metrics | `market-metrics-development` |
 | 4 | Pending | Naive and AutoReg forecasts with correct maturity/error tracking | `forecasting-development` |
