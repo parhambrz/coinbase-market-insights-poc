@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Coinbase Level 2 order-book insights proof of concept"
 requires-python = ">=3.13,<3.14"
 dependencies = [
+    "pydantic>=2.12,<3",
     "sortedcontainers>=2.4.0",
 ]
 
