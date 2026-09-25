@@ -1,0 +1,57 @@
+[build-system]
+requires = ["uv_build>=0.12.0,<0.13.0"]
+build-backend = "uv_build"
+
+[project]
+name = "coinbase-insights"
+version = "0.1.0"
+description = "Coinbase Level 2 order-book insights proof of concept"
+requires-python = ">=3.13,<3.14"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.0",
+    "pyright>=1.1",
+    "pytest>=8.0",
+    "pytest-asyncio>=1.0",
+    "pytest-cov>=7.0",
+    "ruff>=0.14",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-config",
+    "--strict-markers",
+    "--cov=coinbase_insights",
+    "--cov-branch",
+    "--cov-report=term-missing:skip-covered",
+]
+asyncio_mode = "strict"
+testpaths = ["tests"]
+markers = [
+    "live: optional test requiring access to the public Coinbase feed",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["coinbase_insights"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["ASYNC", "B", "E", "F", "I", "UP"]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.13"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+venv = ".venv"
+venvPath = "."
