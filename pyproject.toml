@@ -10,6 +10,7 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "pydantic>=2.12,<3",
     "sortedcontainers>=2.4.0",
+    "statsmodels>=0.14,<0.15",
 ]
 
 [dependency-groups]
