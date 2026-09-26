@@ -24,6 +24,7 @@ from coinbase_insights.domain.events import BookSnapshot
 
 COINBASE_WEBSOCKET_URL = "wss://advanced-trade-ws.coinbase.com"
 MAX_MESSAGE_SIZE_BYTES = 8 * 1024 * 1024
+WEBSOCKET_CLOSE_TIMEOUT_SECONDS = 1.0
 
 
 class WebSocketTransport(Protocol):
@@ -264,6 +265,7 @@ class WebsocketsTransportFactory:
             COINBASE_WEBSOCKET_URL,
             ping_interval=None,
             max_size=MAX_MESSAGE_SIZE_BYTES,
+            close_timeout=WEBSOCKET_CLOSE_TIMEOUT_SECONDS,
         )
         return _WebsocketsTransport(connection)
 
