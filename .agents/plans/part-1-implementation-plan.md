@@ -63,7 +63,7 @@ Use `uv run pytest --cov=coinbase_insights --cov-branch` for explicit coverage r
 | 5 | Complete | Stable configuration, result contract, console, and NDJSON | `cli-output-development` |
 | 6 | Complete | Resilient live WebSocket adapter and feed-health state machine | `coinbase-feed-development` |
 | 7 | Complete | Five-second runtime composition and recorded-stream end-to-end path | `market-metrics-development` |
-| 8 | Pending | Live hardening and resilience evidence | Feed, testing, and CLI skills |
+| 8 | Complete | Live hardening and resilience evidence | Feed, testing, and CLI skills |
 | 9 | Pending | Docker, CI, reviewer documentation, and release gate | `part1-packaging-delivery` |
 
 Testing is part of every milestone. Use `part1-testing` whenever choosing test boundaries, fixtures, fake-time behavior, properties, or coverage.
