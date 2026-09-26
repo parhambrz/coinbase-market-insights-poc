@@ -229,6 +229,21 @@ class PredictionLedger:
                 scores.extend(self._unscored(prediction))
         return tuple(scores)
 
+    def mature_missing(
+        self,
+        *,
+        product_id: str,
+        target_at: datetime,
+    ) -> tuple[ForecastScore, ...]:
+        _require_aware(target_at, "target_at")
+        scores: list[ForecastScore] = []
+        while self._pending and self._pending[0].primary.target_at <= target_at:
+            prediction = self._pending.popleft()
+            if prediction.primary.product_id != product_id:
+                raise ValueError("prediction and missing target products must match")
+            scores.extend(self._unscored(prediction))
+        return tuple(scores)
+
     def error_count(self, role: ForecastRole) -> int:
         return len(self._errors[role])
 
