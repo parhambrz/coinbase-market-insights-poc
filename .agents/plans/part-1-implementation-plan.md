@@ -64,7 +64,7 @@ Use `uv run pytest --cov=coinbase_insights --cov-branch` for explicit coverage r
 | 6 | Complete | Resilient live WebSocket adapter and feed-health state machine | `coinbase-feed-development` |
 | 7 | Complete | Five-second runtime composition and recorded-stream end-to-end path | `market-metrics-development` |
 | 8 | Complete | Live hardening and resilience evidence | Feed, testing, and CLI skills |
-| 9 | Pending | Docker, CI, reviewer documentation, and release gate | `part1-packaging-delivery` |
+| 9 | Complete | Docker, CI, reviewer documentation, and release gate | `part1-packaging-delivery` |
 
 Testing is part of every milestone. Use `part1-testing` whenever choosing test boundaries, fixtures, fake-time behavior, properties, or coverage.
 
@@ -690,7 +690,7 @@ Include:
 
 | Challenge requirement | Implementation evidence | Test evidence |
 |---|---|---|
-| User selects product | Typer `--product` configuration | CLI validation/integration test |
+| User selects product | `argparse` `--product` configuration | CLI validation/integration test |
 | Output every five seconds | UTC-aligned runtime sampler | Fake-clock no-drift test |
 | Highest bid/quantity | `OrderBook` immutable BBO | Snapshot/update/delete tests |
 | Lowest ask/quantity | `OrderBook` immutable BBO | Snapshot/update/delete tests |
