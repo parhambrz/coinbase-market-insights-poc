@@ -10,6 +10,7 @@ import pytest
 from coinbase_insights.coinbase.client import (
     COINBASE_WEBSOCKET_URL,
     MAX_MESSAGE_SIZE_BYTES,
+    WEBSOCKET_CLOSE_TIMEOUT_SECONDS,
     BackoffPolicy,
     CoinbaseFeedClient,
     FeedEvent,
@@ -130,6 +131,7 @@ async def test_live_transport_allows_bounded_multi_megabyte_snapshots(
         COINBASE_WEBSOCKET_URL,
         ping_interval=None,
         max_size=MAX_MESSAGE_SIZE_BYTES,
+        close_timeout=WEBSOCKET_CLOSE_TIMEOUT_SECONDS,
     )
 
 
