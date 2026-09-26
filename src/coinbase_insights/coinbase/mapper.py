@@ -7,6 +7,7 @@ from coinbase_insights.coinbase.messages import (
     Envelope,
     HeartbeatEnvelope,
     Level2Event,
+    SubscriptionEnvelope,
 )
 from coinbase_insights.domain.events import BookLevel, BookSnapshot, PriceLevelUpdate, Side
 
@@ -36,7 +37,21 @@ class MappedHeartbeatEnvelope:
     heartbeats: tuple[HeartbeatSignal, ...]
 
 
-type MappedEnvelope = MappedLevel2Envelope | MappedHeartbeatEnvelope
+@dataclass(frozen=True, slots=True)
+class SubscriptionSignal:
+    channel: str
+    product_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class MappedSubscriptionEnvelope:
+    source_sequence: int
+    server_time: datetime
+    received_at: datetime
+    subscriptions: tuple[SubscriptionSignal, ...]
+
+
+type MappedEnvelope = MappedLevel2Envelope | MappedHeartbeatEnvelope | MappedSubscriptionEnvelope
 
 
 def map_envelope(envelope: Envelope, *, received_at: datetime) -> MappedEnvelope:
@@ -52,6 +67,17 @@ def map_envelope(envelope: Envelope, *, received_at: datetime) -> MappedEnvelope
                     counter=heartbeat.heartbeat_counter,
                 )
                 for heartbeat in envelope.events
+            ),
+        )
+    if isinstance(envelope, SubscriptionEnvelope):
+        return MappedSubscriptionEnvelope(
+            source_sequence=envelope.sequence_num,
+            server_time=envelope.timestamp,
+            received_at=received_at,
+            subscriptions=tuple(
+                SubscriptionSignal(channel=channel, product_ids=product_ids)
+                for event in envelope.events
+                for channel, product_ids in event.subscriptions.items()
             ),
         )
 
