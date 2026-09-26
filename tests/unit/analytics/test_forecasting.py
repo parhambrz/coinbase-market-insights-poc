@@ -251,6 +251,18 @@ def test_missing_target_is_unscored_and_never_shifted_to_later_sample() -> None:
     assert ledger.error_count(ForecastRole.NAIVE) == 0
 
 
+def test_missing_target_can_be_matured_without_a_price_at_exact_boundary() -> None:
+    ledger = PredictionLedger()
+    ledger.append(bundle(primary="110", naive="100"))
+    target_at = PREDICTED_AT + timedelta(seconds=60)
+
+    scores = ledger.mature_missing(product_id=PRODUCT_ID, target_at=target_at)
+
+    assert len(scores) == 2
+    assert all(score.status is ForecastScoreStatus.UNSCORED_MISSING_TARGET for score in scores)
+    assert len(ledger) == 0
+
+
 def test_primary_and_naive_rolling_errors_remain_separate() -> None:
     ledger = PredictionLedger()
     ledger.append(bundle(primary="110", naive="100"))
