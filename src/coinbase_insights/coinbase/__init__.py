@@ -11,12 +11,15 @@ from coinbase_insights.coinbase.mapper import (
     MappedEnvelope,
     MappedHeartbeatEnvelope,
     MappedLevel2Envelope,
+    MappedSubscriptionEnvelope,
+    SubscriptionSignal,
     map_envelope,
 )
 from coinbase_insights.coinbase.messages import (
     Envelope,
     HeartbeatEnvelope,
     Level2Envelope,
+    SubscriptionEnvelope,
     parse_envelope,
 )
 
@@ -32,6 +35,9 @@ __all__ = [
     "MappedEnvelope",
     "MappedHeartbeatEnvelope",
     "MappedLevel2Envelope",
+    "MappedSubscriptionEnvelope",
+    "SubscriptionEnvelope",
+    "SubscriptionSignal",
     "WebsocketsTransportFactory",
     "build_subscription_messages",
     "map_envelope",
