@@ -1,0 +1,12 @@
+{
+  "channel": "heartbeats",
+  "timestamp": "2026-09-26T09:25:47.300446339Z",
+  "sequence_num": 13,
+  "events": [
+    {
+      "current_time": "2026-09-26 09:25:47.299758158 +0000 UTC m=+293994.401262066",
+      "heartbeat_counter": 293994
+    }
+  ],
+  "_fixture_provenance": "captured unauthenticated from Coinbase Advanced Trade WebSocket on 2026-09-26"
+}

@@ -1,0 +1,15 @@
+{
+  "channel": "subscriptions",
+  "timestamp": "2026-09-26T09:25:46.926496714Z",
+  "sequence_num": 3,
+  "events": [
+    {
+      "subscriptions": {
+        "level2": [
+          "BTC-USD"
+        ]
+      }
+    }
+  ],
+  "_fixture_provenance": "captured unauthenticated from Coinbase Advanced Trade WebSocket on 2026-09-26"
+}

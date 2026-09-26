@@ -1,0 +1,26 @@
+{
+  "channel": "l2_data",
+  "timestamp": "2026-09-26T09:25:31.62638727Z",
+  "sequence_num": 0,
+  "events": [
+    {
+      "type": "snapshot",
+      "product_id": "BTC-USD",
+      "updates": [
+        {
+          "side": "bid",
+          "event_time": "2026-09-26T09:25:31.325916Z",
+          "price_level": "83970.07",
+          "new_quantity": "0.1618322"
+        },
+        {
+          "side": "offer",
+          "event_time": "2026-09-26T09:25:31.325916Z",
+          "price_level": "83970.08",
+          "new_quantity": "1.29410471"
+        }
+      ]
+    }
+  ],
+  "_fixture_provenance": "captured unauthenticated from Coinbase Advanced Trade WebSocket on 2026-09-26; full 41385-level snapshot truncated to one bid and one offer"
+}
