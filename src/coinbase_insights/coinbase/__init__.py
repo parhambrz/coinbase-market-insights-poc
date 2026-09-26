@@ -1,3 +1,11 @@
+from coinbase_insights.coinbase.client import (
+    BackoffPolicy,
+    CoinbaseFeedClient,
+    FeedEvent,
+    FeedState,
+    WebsocketsTransportFactory,
+    build_subscription_messages,
+)
 from coinbase_insights.coinbase.mapper import (
     HeartbeatSignal,
     MappedEnvelope,
@@ -13,13 +21,19 @@ from coinbase_insights.coinbase.messages import (
 )
 
 __all__ = [
+    "BackoffPolicy",
+    "CoinbaseFeedClient",
     "Envelope",
+    "FeedEvent",
+    "FeedState",
     "HeartbeatEnvelope",
     "HeartbeatSignal",
     "Level2Envelope",
     "MappedEnvelope",
     "MappedHeartbeatEnvelope",
     "MappedLevel2Envelope",
+    "WebsocketsTransportFactory",
+    "build_subscription_messages",
     "map_envelope",
     "parse_envelope",
 ]
