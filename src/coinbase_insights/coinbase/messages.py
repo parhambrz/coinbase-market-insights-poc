@@ -1,3 +1,5 @@
+import re
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import Annotated, Literal
 
@@ -9,6 +11,11 @@ from pydantic import (
     TypeAdapter,
     field_validator,
     model_validator,
+)
+
+_GO_TIME_PATTERN = re.compile(
+    r"(?P<base>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\."
+    r"(?P<fraction>\d{1,9}) (?P<offset>[+-]\d{4}) UTC(?: m=[+-]\d+\.\d+)?"
 )
 
 
@@ -67,6 +74,18 @@ class HeartbeatEvent(CoinbaseMessage):
     current_time: AwareDatetime
     heartbeat_counter: Annotated[int, Field(ge=0)]
 
+    @field_validator("current_time", mode="before")
+    @classmethod
+    def normalize_go_time(cls, value: object) -> object:
+        if not isinstance(value, str):
+            return value
+        match = _GO_TIME_PATTERN.fullmatch(value)
+        if match is None:
+            return value
+        fraction = match.group("fraction")[:6].ljust(6, "0")
+        offset = match.group("offset")
+        return datetime.fromisoformat(f"{match.group('base')}.{fraction}{offset[:3]}:{offset[3:]}")
+
 
 class HeartbeatEnvelope(CoinbaseMessage):
     channel: Literal["heartbeats"]
@@ -75,8 +94,19 @@ class HeartbeatEnvelope(CoinbaseMessage):
     events: Annotated[tuple[HeartbeatEvent, ...], Field(min_length=1)]
 
 
+class SubscriptionEvent(CoinbaseMessage):
+    subscriptions: Annotated[dict[str, tuple[str, ...]], Field(min_length=1)]
+
+
+class SubscriptionEnvelope(CoinbaseMessage):
+    channel: Literal["subscriptions"]
+    timestamp: AwareDatetime
+    sequence_num: Annotated[int, Field(ge=0)]
+    events: Annotated[tuple[SubscriptionEvent, ...], Field(min_length=1)]
+
+
 type Envelope = Annotated[
-    Level2Envelope | HeartbeatEnvelope,
+    Level2Envelope | HeartbeatEnvelope | SubscriptionEnvelope,
     Field(discriminator="channel"),
 ]
 _ENVELOPE_ADAPTER: TypeAdapter[Envelope] = TypeAdapter(Envelope)
