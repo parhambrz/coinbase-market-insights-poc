@@ -15,6 +15,9 @@ dependencies = [
     "websockets>=15,<16",
 ]
 
+[project.scripts]
+coinbase-insights = "coinbase_insights.cli:main"
+
 [dependency-groups]
 dev = [
     "hypothesis>=6.0",
