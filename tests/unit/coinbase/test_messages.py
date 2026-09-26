@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from coinbase_insights.coinbase.messages import (
     HeartbeatEnvelope,
     Level2Envelope,
+    SubscriptionEnvelope,
     parse_envelope,
 )
 
@@ -31,6 +32,16 @@ def test_known_snapshot_update_and_heartbeat_payloads_validate() -> None:
     assert update.events[0].type == "update"
     assert isinstance(heartbeat, HeartbeatEnvelope)
     assert heartbeat.events[0].heartbeat_counter == 42
+
+
+def test_live_subscription_acknowledgement_and_go_time_heartbeat_validate() -> None:
+    subscription = parse_envelope((FIXTURES / "live_subscriptions_2026-09-26.json").read_text())
+    heartbeat = parse_envelope((FIXTURES / "live_heartbeat_2026-09-26.json").read_text())
+
+    assert isinstance(subscription, SubscriptionEnvelope)
+    assert subscription.events[0].subscriptions == {"level2": ("BTC-USD",)}
+    assert isinstance(heartbeat, HeartbeatEnvelope)
+    assert heartbeat.events[0].current_time.isoformat() == "2026-09-26T09:25:47.299758+00:00"
 
 
 def test_numeric_source_fields_remain_strings_after_validation() -> None:

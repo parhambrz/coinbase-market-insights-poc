@@ -3,19 +3,24 @@ from collections.abc import AsyncGenerator, Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
+from unittest.mock import AsyncMock
 
 import pytest
 
 from coinbase_insights.coinbase.client import (
+    COINBASE_WEBSOCKET_URL,
+    MAX_MESSAGE_SIZE_BYTES,
     BackoffPolicy,
     CoinbaseFeedClient,
     FeedEvent,
     FeedState,
+    WebsocketsTransportFactory,
     build_subscription_messages,
 )
 from coinbase_insights.coinbase.mapper import (
     MappedHeartbeatEnvelope,
     MappedLevel2Envelope,
+    MappedSubscriptionEnvelope,
     map_envelope,
 )
 from coinbase_insights.coinbase.messages import parse_envelope
@@ -110,12 +115,32 @@ def test_subscription_messages_include_optional_jwt_without_other_changes() -> N
 
 
 @pytest.mark.asyncio
+async def test_live_transport_allows_bounded_multi_megabyte_snapshots(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from coinbase_insights.coinbase import client as client_module
+
+    connection = object()
+    connect_mock = AsyncMock(return_value=connection)
+    monkeypatch.setattr(client_module, "connect", connect_mock)
+
+    await WebsocketsTransportFactory()()
+
+    connect_mock.assert_awaited_once_with(
+        COINBASE_WEBSOCKET_URL,
+        ping_interval=None,
+        max_size=MAX_MESSAGE_SIZE_BYTES,
+    )
+
+
+@pytest.mark.asyncio
 async def test_contiguous_level2_and_heartbeat_stream_maps_complete_envelopes() -> None:
     transport = ScriptedTransport(
         [
             with_sequence(payload("level2_snapshot.json"), 100),
-            with_sequence(payload("heartbeat.json"), 101),
-            with_sequence(payload("level2_updates.jsonl"), 102),
+            with_sequence(payload("live_subscriptions_2026-09-26.json"), 101),
+            with_sequence(payload("heartbeat.json"), 102),
+            with_sequence(payload("level2_updates.jsonl"), 103),
             ConnectionError("closed"),
         ]
     )
@@ -138,14 +163,17 @@ async def test_contiguous_level2_and_heartbeat_stream_maps_complete_envelopes() 
         FeedState.HEALTHY,
         FeedState.HEALTHY,
         FeedState.HEALTHY,
+        FeedState.HEALTHY,
         FeedState.INVALIDATED,
     ]
     assert all(event.connection_id == "connection-1" for event in events)
     snapshot = events[2].envelope
-    heartbeat = events[3].envelope
-    update = events[4].envelope
+    subscription = events[3].envelope
+    heartbeat = events[4].envelope
+    update = events[5].envelope
     assert isinstance(snapshot, MappedLevel2Envelope)
     assert isinstance(snapshot.events[0], BookSnapshot)
+    assert isinstance(subscription, MappedSubscriptionEnvelope)
     assert isinstance(heartbeat, MappedHeartbeatEnvelope)
     assert isinstance(update, MappedLevel2Envelope)
     assert all(isinstance(item, PriceLevelUpdate) for item in update.events)

@@ -10,6 +10,7 @@ from pydantic import ValidationError
 from coinbase_insights.coinbase.mapper import (
     MappedHeartbeatEnvelope,
     MappedLevel2Envelope,
+    MappedSubscriptionEnvelope,
     map_envelope,
 )
 from coinbase_insights.coinbase.messages import parse_envelope
@@ -66,6 +67,17 @@ def test_heartbeat_maps_to_typed_health_signal() -> None:
     assert mapped.received_at == RECEIVED_AT
     assert mapped.heartbeats[0].current_time == datetime(2026, 9, 25, 12, 0, tzinfo=UTC)
     assert mapped.heartbeats[0].counter == 42
+
+
+def test_subscription_acknowledgement_maps_without_losing_sequence() -> None:
+    source = parse_envelope((FIXTURES / "live_subscriptions_2026-09-26.json").read_text())
+
+    mapped = map_envelope(source, received_at=RECEIVED_AT)
+
+    assert isinstance(mapped, MappedSubscriptionEnvelope)
+    assert mapped.source_sequence == 3
+    assert mapped.subscriptions[0].channel == "level2"
+    assert mapped.subscriptions[0].product_ids == ("BTC-USD",)
 
 
 def test_naive_receive_time_is_rejected() -> None:
