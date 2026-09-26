@@ -20,6 +20,19 @@ COINBASE_LIVE_TEST=1 uv run pytest --no-cov tests/live/test_coinbase_smoke.py -q
 
 No credentials are required. `COINBASE_JWT` remains optional and was not exercised because no credentials were available.
 
+## Test taxonomy
+
+- Unit tests isolate domain state, calculations, forecasting policy, configuration, rendering, and reconnect decisions.
+- Contract tests parse synthetic and sanitized Coinbase envelopes, then verify exact mapping into domain events.
+- Integration tests join captured feed sequences to order-book recovery, sampling, forecasting, and output without opening a network connection.
+- Live tests are optional compatibility checks against Coinbase. They are excluded from required local checks and CI because market and network availability are nondeterministic.
+
+Runtime tests inject clocks and asynchronous sleep functions. They advance virtual UTC time directly, proving exact boundaries, no cumulative drift, and forecast maturity without wall-clock waits. Scripted transports control messages, disconnects, and timeout paths.
+
+Hypothesis generates decimal price levels and update sequences for order-book properties that example tests can miss. These tests check invariants such as exact price identity, absolute replacement, deletion at zero, and agreement between the maintained best levels and a reference representation.
+
+The configured coverage gate requires at least 80% branch coverage for `coinbase_insights`. Coverage is a regression signal, not evidence by itself: assertions target source semantics, invalid-state suppression, recovery, model fallbacks, and boundary conditions. Generated lines, live availability, and unstable numerical coefficients are not tested merely to increase the percentage.
+
 ## Captured fixture provenance
 
 The files prefixed with `live_` under `tests/fixtures/coinbase/` were captured from the unauthenticated Coinbase Advanced Trade WebSocket on 2026-09-26:
