@@ -23,6 +23,7 @@ from coinbase_insights.coinbase.messages import parse_envelope
 from coinbase_insights.domain.events import BookSnapshot
 
 COINBASE_WEBSOCKET_URL = "wss://advanced-trade-ws.coinbase.com"
+MAX_MESSAGE_SIZE_BYTES = 8 * 1024 * 1024
 
 
 class WebSocketTransport(Protocol):
@@ -259,7 +260,11 @@ class _WebsocketsTransport:
 
 class WebsocketsTransportFactory:
     async def __call__(self) -> WebSocketTransport:
-        connection = await connect(COINBASE_WEBSOCKET_URL, ping_interval=None)
+        connection = await connect(
+            COINBASE_WEBSOCKET_URL,
+            ping_interval=None,
+            max_size=MAX_MESSAGE_SIZE_BYTES,
+        )
         return _WebsocketsTransport(connection)
 
 
