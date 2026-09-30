@@ -1,12 +1,10 @@
 # Coinbase Market Insights
 
-A production-minded Part 1 proof of concept for the 2026 Data Engineer Challenge. The application consumes Coinbase Advanced Trade Level 2 and heartbeat channels, reconstructs one product's order book, and emits market metrics and a 60-second forecast every five seconds.
-
-Part 2 infrastructure is intentionally out of scope.
+A Part 1 proof of concept for the 2026 Data Engineer Challenge. It consumes Coinbase Level 2 market data for one product and emits order-book metrics and a 60-second mid-price forecast every five seconds. Part 2 is out of scope.
 
 ## Architecture
 
-The implementation is a single-process Python 3.13 CLI. Source parsing, domain state, analytics, runtime orchestration, and rendering have separate ownership boundaries.
+The implementation is a single-process Python 3.13 CLI:
 
 ```mermaid
 flowchart LR
@@ -19,14 +17,14 @@ flowchart LR
     F --> O
 ```
 
-See [docs/architecture.md](docs/architecture.md) for the implemented design and [docs/testing.md](docs/testing.md) for evidence and fixture provenance.
+See [docs/architecture.md](docs/architecture.md) for design details and [docs/testing.md](docs/testing.md) for test and live-verification evidence.
 
 ## Prerequisites
 
 - Python 3.13
-- [uv](https://docs.astral.sh/uv/) 0.12.19 or compatible
-- Docker, only for the container workflow
-- Internet access to run the live application
+- [uv](https://docs.astral.sh/uv/) 0.12.19
+- Internet access for the Coinbase feed
+- Docker (optional)
 
 Install the locked development environment:
 
@@ -36,21 +34,39 @@ uv sync --frozen --all-groups
 
 ## Run
 
-No Coinbase account or credentials are required:
+No Coinbase account is required:
 
 ```bash
 uv run coinbase-insights --product BTC-USD
 ```
 
-Select machine-readable output with:
+Use NDJSON for machine-readable output:
 
 ```bash
 uv run coinbase-insights --product ETH-USD --output ndjson
 ```
 
-The default console renderer displays the current top of book, spread, rolling averages, forecast, and matured errors. NDJSON emits one complete object per UTC-aligned five-second boundary. Prices, quantities, forecasts, and errors are fixed-point strings so decimal market values remain exact.
+Optional authentication uses the `COINBASE_JWT` environment variable; the public feed works without it.
 
-Coinbase JWT authentication is optional. Set `COINBASE_JWT` in the process environment when required; do not put credentials in command history, source files, images, or logs. The application never prints the configured secret.
+## Representative Output
+
+Illustrative NDJSON record, not a guaranteed live value:
+
+```json
+{
+    "product_id": "BTC-USD",
+    "as_of": "2026-09-25T12:00:00Z",
+    "feed_status": "healthy",
+    "highest_bid": {"price": "109999.10", "quantity": "0.42"},
+    "lowest_ask": {"price": "110000.20", "quantity": "0.31"},
+    "current_spread": "1.10",
+    "max_spread_since_start": "3.40",
+    "average_mid_price": {"1m": {"value": "109998.45", "samples": 12}},
+    "forecast_60s": {"value": "110005.30", "naive_value": "109999.65"}
+}
+```
+
+Decimal values are strings to preserve exact market values. Full records include 1/5/15-minute averages and primary/naive forecast errors.
 
 ## Quality Checks
 
@@ -62,9 +78,9 @@ uv run pyright
 uv run pytest
 ```
 
-The default pytest command includes branch coverage and enforces the configured 80% repository threshold. Required tests are deterministic and do not contact Coinbase.
+Tests are deterministic and network-free; `pytest` includes branch coverage with an 80% minimum. Optional live-test instructions are in [docs/testing.md](docs/testing.md).
 
-Build and inspect the non-root container:
+Container:
 
 ```bash
 docker build -t coinbase-insights:local .
@@ -72,25 +88,18 @@ docker run --rm coinbase-insights:local --help
 docker run --rm coinbase-insights:local --product BTC-USD --output ndjson
 ```
 
-Runtime arguments follow the image name. The image uses an exec-form entrypoint so host signals reach Python.
-
-## Correctness And Recovery
-
-A snapshot replaces the complete book; updates set absolute quantities and zero removes a level. Prices and quantities use `Decimal`, never `float`. The maximum spread is observed on every valid best-price change, while rolling windows include observations in $(t-W,t]$.
-
-Sequence gaps, regressions, malformed messages, heartbeat expiry, and disconnects invalidate the book immediately. Numeric output remains unavailable until a new connection supplies a fresh snapshot. Historical observations are not presented as current state.
-
-The primary forecast fits `statsmodels` AutoReg to first differences of up to 180 five-second observations, using 12 lags and a 12-step horizon. It requires 60 observations. A naive persistence forecast is always retained as a baseline and fallback. Forecast errors mature only at the exact 60-second target; missing target observations are unscored. Neither forecast is a trading recommendation, and the primary model should be judged against the naive error rather than assumed to be predictive.
-
-## Assumptions And Limitations
+## Key Assumptions
 
 - One Coinbase spot product is selected at startup.
-- State, histories, and maximum spread reset when the process restarts.
-- Recovery restores correct current state but cannot reconstruct market changes missed during a feed gap.
-- The public feed, network, and product validity remain external dependencies for live runs.
-- Snapshot parsing and order-book mutation occur on the event-loop thread for atomic state transitions. A signal received during unusually large synchronous message processing is handled when that processing yields.
-- Performance measurements in [docs/testing.md](docs/testing.md) are point-in-time evidence, not service-level guarantees.
+- Prices and quantities use exact `Decimal` values.
+- State and rolling histories reset on restart.
+- A feed gap invalidates the book; output remains unavailable until a fresh snapshot arrives. Missed events cannot be reconstructed.
+- AutoReg is compared with a naive persistence baseline and falls back safely during warm-up or model failure. Forecasts are analytical estimates, not trading advice.
 
-## Working With AI
+## Working with AI
 
-TODO
+I used an AI coding agent to help draft the architecture, implement modules and tests, prepare documentation, and run validation commands. I wrote and revised the final scope, architecture decisions, and milestone acceptance criteria; reviewed the generated changes; interpreted live-feed evidence; and controlled all commits.
+
+One concrete failure occurred when an automated patch corrupted the Coinbase message and mapper modules. I caught it through diff review and focused tests, restored the intended source contracts, and reran the focused and full suites before proceeding. Live checks also corrected subtler assumptions about snapshot size, subscription sequence messages, and heartbeat timestamps.
+
+I would not let an agent work unsupervised with credentials, feed-consistency semantics, financial calculations, model evaluation, release decisions, or production infrastructure. Errors in those areas can expose secrets or produce plausible but incorrect market data, so they require human review and evidence from tests or observed source behavior.
