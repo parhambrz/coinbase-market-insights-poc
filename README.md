@@ -1,6 +1,6 @@
 # Coinbase Market Insights
 
-A Part 1 proof of concept for the 2026 Data Engineer Challenge. It consumes Coinbase Level 2 market data for one product and emits order-book metrics and a 60-second mid-price forecast every five seconds. Part 2 is out of scope.
+The core data ingestion part of Coinbase PoC. It consumes Coinbase Level 2 market data for one product and emits order-book metrics and a 60-second mid-price forecast every five seconds.
 
 ## Architecture
 
@@ -98,8 +98,4 @@ docker run --rm coinbase-insights:local --product BTC-USD --output ndjson
 
 ## Working with AI
 
-I used an AI coding agent to help draft the architecture, implement modules and tests, prepare documentation, and run validation commands. I wrote and revised the final scope, architecture decisions, and milestone acceptance criteria; reviewed the generated changes; interpreted live-feed evidence; and controlled all commits.
-
-One concrete failure occurred when an automated patch corrupted the Coinbase message and mapper modules. I caught it through diff review and focused tests, restored the intended source contracts, and reran the focused and full suites before proceeding. Live checks also corrected subtler assumptions about snapshot size, subscription sequence messages, and heartbeat timestamps.
-
-I would not let an agent work unsupervised with credentials, feed-consistency semantics, financial calculations, model evaluation, release decisions, or production infrastructure. Errors in those areas can expose secrets or produce plausible but incorrect market data, so they require human review and evidence from tests or observed source behavior.
+TODO
