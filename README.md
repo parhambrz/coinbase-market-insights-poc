@@ -98,4 +98,19 @@ docker run --rm coinbase-insights:local --product BTC-USD --output ndjson
 
 ## Working with AI
 
-TODO
+### What you delegated to an agent and what you wrote or rewrote yourself
+
+* The initial architecture for plan and implementation, skills, tests and documentations were delegated to the agent.
+* Architecture revision and step wise test and validation of the implentation process including exit criteria, Commit policies, feed and forecast assumptions and tests. The documentations were human reviewed. Testing on isolated environment and setup the cloud env (Azure) were done manually. Dev tool for schema validation was written by the agent and human revisions. All commits were done manually.
+
+### One thing the agent got wrong, or subtly wrong, and how you caught it
+
+* An automated patch for live coinbase subscriptions retrieval corrupted the Coinbase message and mapper modules.
+* Diff review and focused tests exposed the damage before the change was accepted.
+* I restored the intended source contracts and reran the focused and full test suites. Live checks also corrected assumptions about snapshot size, subscription sequence messages, and heartbeat timestamps.
+
+### Where you would not let an agent work unsupervised on this code, and why
+
+* Credentials/secrets. AI mistakes can happen and expose auth materials.
+* A reasonable looking code with no error can still show incorrect business metrics. A final validation of the metrics including step wise confirmation of exit criteria during implementation is prefered to be done manually. Agents are likely to confidently say an incorrect work is done successfully.
+* Model evaluation, release decisions, and production infrastructure. These are processes that require human judgment and risk ownership. AI should not decide whether a model performs better before human validation. This needs tests, live checks, analysis of the limitations and hidden bottlenecks. The production deployment architecture, permissions, secret management, networking, monitoring, etc require human judgment at the top level.
